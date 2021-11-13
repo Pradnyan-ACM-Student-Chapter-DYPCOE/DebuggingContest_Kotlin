@@ -3,23 +3,42 @@ package com.example.todoapp
 import android.annotation.SuppressLint
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.widget.Button
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.todoapp.db.DatabaseHelper
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.update_dialog.*
 
 class MainActivity : AppCompatActivity(), TodoAdapter.OnItemClickListener {
     private val todoList = ArrayList<TodoData>()
     private val myDB : DatabaseHelper = DatabaseHelper(this)
     private val todoAdapter = TodoAdapter(todoList, this)
+    private lateinit var builder: AlertDialog.Builder
+    private lateinit var dialog: AlertDialog
+    private lateinit var del: Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        btnAddTodo.setOnClickListener{addTodo()}
+
+        btnAddTodo.setOnClickListener{
+            val text = etTodo.text.toString()
+            // checking edit text is null or not
+            if (text.trim().isNotEmpty()) {
+                addTodo(text)
+                //clear edit text
+                etTodo.text?.clear()
+            } else {
+                Toast.makeText(this, "Enter Valid Todo text", Toast.LENGTH_SHORT).show()
+            }
+
+        }
         rvTodos.layoutManager = LinearLayoutManager(this)
         rvTodos.adapter = todoAdapter
-
         loadTodos()
     }
 
@@ -42,19 +61,36 @@ class MainActivity : AppCompatActivity(), TodoAdapter.OnItemClickListener {
     }
 
     override fun onDeleteClick(position: Int) {
-        val itemIdToDelete = todoList[position].id
-        Toast.makeText(this, "Delete button clicked for id $itemIdToDelete", Toast.LENGTH_SHORT).show()
-        loadTodos()
+        dialog(position)
+
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    private fun addTodo(){
-            val status = myDB.saveTodo(etTodo.text.toString())
-            if(status > -1){
+    private fun addTodo(text:String){
+            val status = myDB.saveTodo(text)
+            if(status > 0){
                 loadTodos()
                 Toast.makeText(this, "Success", Toast.LENGTH_SHORT).show()
             } else {
                 Toast.makeText(this, "Something went wrong!", Toast.LENGTH_SHORT).show()
             }
+
     }
+    // created dialog for deleting todo
+    private fun dialog(position: Int){
+        val itemIdToDelete = todoList[position].id
+        builder = AlertDialog.Builder(this)
+        val itemView: View =
+            LayoutInflater.from(this@MainActivity).inflate(R.layout.update_dialog, null)
+        dialog = builder.create()
+        dialog.setView(itemView)
+        del = itemView.findViewById<Button>(R.id.del_button)
+        del.setOnClickListener {
+            //deleting todo
+            myDB.deleteTodo(itemIdToDelete)
+            dialog.dismiss()
+        }
+        dialog.show()
+    }
+
 }

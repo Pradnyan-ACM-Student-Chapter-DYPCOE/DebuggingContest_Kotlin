@@ -20,7 +20,11 @@ class TodoAdapter (private val list: List<TodoData>,
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val todoItem = list[position]
+        holder.tvTodoId.text = position.toString()
         holder.tvTodoText.text = todoItem.todoText
+        holder.itemView.setOnClickListener {
+
+        }
     }
 
     override fun getItemCount(): Int = list.size
