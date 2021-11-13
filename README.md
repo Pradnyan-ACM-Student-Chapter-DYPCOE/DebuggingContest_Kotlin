@@ -24,4 +24,13 @@
 
 ## Bugs
 
-Will be listed here, just before the contest starts
+1. Empty Todo text should not be allowed to save
+2. Text  not clearing in edit text after successful save
+3. Todo Number (i.e. Index + 1) not showing in list
+e.g. 1. First Todo
+	2. Second Todo
+4. Delete func not working
+5. Ask for dialog confirming , Are you sure want to delete {todoText} ?
+6. Clicking anywhere on the list item should open a dialog box showing the same todoText & a button to delete it and a button to close that dialog box
+7. If todos list is empty, instead of showing empty list, show a text that says the list is empty, and add a todo to see the list
+8. Change the Icon of the App(any icon would do)
